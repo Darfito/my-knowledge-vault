@@ -17,6 +17,7 @@ All vault documents sorted by **last updated date, newest first**. Update this f
 
 | Document | What it covers |
 |---|---|
+| [[AI Software Factory/Using/Paperclip Agent Auth — Subscription vs API]] | New — subscription vs API key auth, Shannon split (orchestrators=Max, workers=API), setup steps, rate limit tiers |
 | [[AI Software Factory/Using/Agent Capabilities vs Skills vs Instructions]] | New — explains difference between AGENTS.md, skills, and the capabilities display field; includes Shannon agent stack table |
 
 ---

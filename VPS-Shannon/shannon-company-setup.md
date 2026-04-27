@@ -93,7 +93,7 @@ Archiving hides the company from the sidebar and all dropdowns but keeps all dat
 ```bash
 # As user paperclip on the VPS:
 cd ~/paperclip-shannon
-pnpm paperclipai company import --from /home/paperclip/shannon-factory
+pnpm paperclipai company import /home/paperclip/shannon-factory
 ```
 
 If the import succeeds, the company and all 4 agents will appear in the Paperclip UI.
