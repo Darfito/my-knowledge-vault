@@ -1,0 +1,9 @@
+# Obsidian (personal state — changes on every open)
+.obsidian/
+
+# Smart Connections / Smart Env plugin cache (auto-regenerated)
+.smart-env/
+
+# OS
+.DS_Store
+Thumbs.db
