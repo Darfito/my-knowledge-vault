@@ -13,6 +13,15 @@ All vault documents sorted by **last updated date, newest first**. Update this f
 
 ---
 
+## 2026-04-30
+
+| Document | What it covers |
+|---|---|
+| [[AI Software Factory/Building/Paperclip Shannon — Modification Plan]] | Steps 6–10 added: Supabase CLI automation, sandbox skills (Playwright), company package fixes, worker subscription mode, company delete bug fix |
+| [[AI Software Factory/Using/Paperclip Agent Auth — Subscription vs API]] | Added worker mode section: `claude -p` (subscription default) vs API key (opt-in for production); added troubleshooting for `claude -p` hang |
+
+---
+
 ## 2026-04-28
 
 | Document | What it covers |

@@ -103,10 +103,51 @@ With subscription auth for orchestrators, the 30k TPM limit only applies to work
 
 ---
 
+## Worker Mode: `claude -p` vs API Key
+
+Workers can run in two modes. Choose based on your situation:
+
+### Mode A — `claude -p` (subscription, no API key)
+
+Workers run as `claude -p "prompt"` subprocess calls. Uses the same subscription credentials as the orchestrators. **This is the default in paperclip-shannon.**
+
+```python
+proc = await asyncio.create_subprocess_exec(
+    "claude", "-p", task["prompt"],
+    stdout=asyncio.subprocess.PIPE,
+    stderr=asyncio.subprocess.PIPE,
+)
+stdout, _ = await proc.communicate()
+```
+
+- No API key needed
+- No per-token cost
+- Model: Sonnet (subscription default)
+- Speed: ~3-8s per worker (process spin-up overhead)
+- No cost reporting to Paperclip dashboard
+- Parallel limit: keep to ~5 concurrent to avoid Claude Code conflicts
+
+### Mode B — API key (Haiku, recommended for production)
+
+Workers call `anthropic.messages.create()` directly using `WORKER_API_KEY`.
+
+- Requires `WORKER_API_KEY=sk-ant-...` set on SWE Lead agent
+- Cost: ~$0.001/worker (Haiku is very cheap)
+- Speed: ~0.5-1s per worker (direct HTTP)
+- Model: Haiku — lighter, purpose-built for execution tasks
+- Full cost reporting to Paperclip dashboard
+- Safe at 10+ parallel workers
+
+**When to switch:** When shipping to customers or when worker speed becomes a bottleneck. The `worker--dispatch` skill documents the API key script inline as an opt-in upgrade.
+
+---
+
 ## Troubleshooting
 
 **Agent wakes up but immediately fails with 429** — `ANTHROPIC_API_KEY` is still set. Remove it so the agent uses subscription auth.
 
-**Workers fail with auth error** — `WORKER_API_KEY` is not set on the SWE Lead / UI/UX Lead agent.
+**Workers fail with auth error** — `WORKER_API_KEY` is not set on the SWE Lead / UI/UX Lead agent (API key mode only).
 
 **`claude login` doesn't persist between server restarts** — Credentials are stored per Unix user. Make sure you ran `claude login` as the `paperclip` user (not root or santoso).
+
+**`claude -p` workers hang** — Too many concurrent `claude -p` processes. Reduce `asyncio.gather()` concurrency to 3-5 workers.
