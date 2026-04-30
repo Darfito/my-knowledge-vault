@@ -107,38 +107,17 @@ With subscription auth for orchestrators, the 30k TPM limit only applies to work
 
 Workers can run in two modes. Choose based on your situation:
 
-### Mode A — `claude -p` (subscription, no API key)
+### Current setup — API key with Sonnet
 
-Workers run as `claude -p "prompt"` subprocess calls. Uses the same subscription credentials as the orchestrators. **This is the default in paperclip-shannon.**
+Workers call `anthropic.messages.create()` directly using `WORKER_API_KEY` and `claude-sonnet-4-6`. **This is the default in paperclip-shannon.**
 
-```python
-proc = await asyncio.create_subprocess_exec(
-    "claude", "-p", task["prompt"],
-    stdout=asyncio.subprocess.PIPE,
-    stderr=asyncio.subprocess.PIPE,
-)
-stdout, _ = await proc.communicate()
-```
-
-- No API key needed
-- No per-token cost
-- Model: Sonnet (subscription default)
-- Speed: ~3-8s per worker (process spin-up overhead)
-- No cost reporting to Paperclip dashboard
-- Parallel limit: keep to ~5 concurrent to avoid Claude Code conflicts
-
-### Mode B — API key (Haiku, recommended for production)
-
-Workers call `anthropic.messages.create()` directly using `WORKER_API_KEY`.
-
-- Requires `WORKER_API_KEY=sk-ant-...` set on SWE Lead agent
-- Cost: ~$0.001/worker (Haiku is very cheap)
-- Speed: ~0.5-1s per worker (direct HTTP)
-- Model: Haiku — lighter, purpose-built for execution tasks
-- Full cost reporting to Paperclip dashboard
+- `WORKER_API_KEY` is separate from `ANTHROPIC_API_KEY` — Claude Code ignores it, orchestrators stay on subscription
+- The key can come from a completely different Anthropic account than the orchestrators
+- Model: `claude-sonnet-4-6`
+- Speed: ~0.5-2s per worker (direct HTTP)
+- Full cost reporting to Paperclip dashboard (Sonnet: $3/$15 per MTok)
 - Safe at 10+ parallel workers
-
-**When to switch:** When shipping to customers or when worker speed becomes a bottleneck. The `worker--dispatch` skill documents the API key script inline as an opt-in upgrade.
+- Set via Paperclip UI → SWE Lead → Configuration → Environment variables: `WORKER_API_KEY=sk-ant-...`
 
 ---
 

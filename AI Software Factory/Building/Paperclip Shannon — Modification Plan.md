@@ -178,27 +178,22 @@ The only **missing** piece is the `pipeline_stage` field on issues and the `NEXT
 
 ---
 
-## Step 9 — Worker Dispatch: Subscription Mode ✅ DONE (2026-04-30)
+## Step 9 — Worker Dispatch: API Key + Sonnet ✅ DONE (2026-04-30)
 
-**What:** Workers now use `claude -p` (Claude Code print mode) instead of `anthropic.messages.create()`. No API key required — uses the subscription credentials already on the server.
+**What:** Workers use Anthropic SDK directly with `WORKER_API_KEY` and `claude-sonnet-4-6`. `WORKER_API_KEY` is intentionally named differently from `ANTHROPIC_API_KEY` so Claude Code does not pick it up as orchestrator auth — orchestrators stay on subscription (`claude login`), workers call the API using a separate key (can be from a different Anthropic account).
 
-**Key decision — `claude -p` vs API key:**
-
-| | `claude -p` (current) | API key (opt-in) |
-|---|---|---|
-| Cost | Subscription (free) | ~$0.001/worker (Haiku) |
-| Speed | ~3-8s/worker | ~0.5-1s/worker |
-| Model | Sonnet | Haiku |
-| Parallel safety | Limited | Safe at 10+ concurrent |
-| Cost visibility | None | Full dashboard reporting |
-
-Decision: use `claude -p` for testing. Switch to API key when shipping to customers (one-file change, documented inline in the skill).
+**Key decisions:**
+- Model: `claude-sonnet-4-6` (better output quality for code/design/test tasks)
+- Auth split: orchestrators = subscription (`claude login` on VPS), workers = `WORKER_API_KEY` env var on SWE Lead
+- Separate accounts supported: Russell's API key for workers, your Max subscription for orchestrators — completely independent
+- Cost reporting to Paperclip restored: Sonnet pricing $3.00/$15.00 per MTok input/output
+- Set `WORKER_API_KEY` via Paperclip UI → SWE Lead → Configuration → Environment variables
 
 **Files changed:**
 
 | File | What changed |
 |---|---|
-| `skills/worker--dispatch/SKILL.md` | Replaced Anthropic SDK script with `claude -p` subprocess script; API key mode documented as opt-in |
+| `skills/worker--dispatch/SKILL.md` | Anthropic SDK with `WORKER_API_KEY`, `claude-sonnet-4-6`, cost reporting with Sonnet pricing |
 
 ---
 
