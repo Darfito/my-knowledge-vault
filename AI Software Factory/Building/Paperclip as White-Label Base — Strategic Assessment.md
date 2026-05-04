@@ -59,7 +59,7 @@ Paperclip is the only open-source platform that frames agents as a *company stru
 
 ## Current State of the Fork
 
-All 5 modification steps are already complete in `paperclip-shannon` (as of 2026-04-25 to 2026-04-27):
+All 10 modification steps are complete in `paperclip-shannon` (as of 2026-04-25 to 2026-04-30):
 
 | Step | What | Status |
 |---|---|---|
@@ -68,8 +68,15 @@ All 5 modification steps are already complete in `paperclip-shannon` (as of 2026
 | 3 | Shannon company bootstrap skill (opinionated 4-agent structure) | ✅ Done |
 | 4 | Worker cost reporting to `/api/cost-events` | ✅ Done |
 | 5 | Review checkpoint using native `request_confirmation` | ✅ Done |
+| 6 | Supabase CLI automation in foundation pipeline | ✅ Done |
+| 7 | Sandbox skills with Playwright (up/down/test/status) | ✅ Done |
+| 8 | Company package fixes (template + PM foundation chain) | ✅ Done |
+| 9 | Workers: Anthropic SDK + `WORKER_API_KEY` + `claude-sonnet-4-6` | ✅ Done |
+| 10 | Company delete: 17 missing FK tables + correct delete order | ✅ Done |
 
 All changes are **additive and isolated** — no breaking changes to Paperclip's schema or API surface.
+
+For full current state including skills inventory and open items, see [[Paperclip Shannon — Current Condition 2026-05-04]].
 
 ---
 

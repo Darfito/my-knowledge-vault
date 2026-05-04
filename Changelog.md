@@ -13,6 +13,16 @@ All vault documents sorted by **last updated date, newest first**. Update this f
 
 ---
 
+## 2026-05-04
+
+| Document | What it covers |
+|---|---|
+| [[AI Software Factory/Building/Paperclip Shannon — Current Condition 2026-05-04]] | New — full snapshot of fork state: all 10 steps complete, 30 skills inventory, auth model, open items, recent fix history |
+| [[Development Log/2026-04-30]] | New — session log for Steps 6–10 (Supabase CLI, sandbox skills, package fixes, SDK workers, delete fix) |
+| [[AI Software Factory/Building/Paperclip as White-Label Base — Strategic Assessment]] | Updated steps table: all 10 steps done (was showing 5) |
+
+---
+
 ## 2026-04-30
 
 | Document | What it covers |
