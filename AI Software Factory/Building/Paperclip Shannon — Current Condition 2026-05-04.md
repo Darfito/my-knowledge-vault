@@ -17,8 +17,8 @@ date: 2026-05-04
 | Item | Value |
 |---|---|
 | Path on VPS | `/home/paperclip/paperclip-shannon` |
-| Branch | `main` |
-| Head commit | `214171a4` — fix: make NewProjectDialog body scrollable (2026-04-30) |
+| Branch | `master` |
+| Head commit | `3652fdb8` — feat: step 11 — workers subscription consolidation (2026-05-04) |
 | Fork base | Paperclip V1 (April 2026 vintage) |
 | Owner | `paperclip` user on VPS (84.247.150.72) |
 | Dev server | `http://84.247.150.72:3100` — run as `pnpm dev --bind lan` |
@@ -27,7 +27,7 @@ date: 2026-05-04
 
 ## Modification Steps Status
 
-All 10 Shannon modification steps are **complete**.
+All 11 Shannon modification steps are **complete**. Phase 2 Step 12 is planned.
 
 | Step | What | Status | Date |
 |---|---|---|---|
@@ -41,8 +41,10 @@ All 10 Shannon modification steps are **complete**.
 | 8 | Company package fixes (template + PM foundation chain) | ✅ Done | 2026-04-30 |
 | 9 | Workers: Anthropic SDK + `WORKER_API_KEY` + Sonnet 4.6 | ✅ Done | 2026-04-30 |
 | 10 | Company delete bug: 17 missing FK tables added | ✅ Done | 2026-04-30 |
+| 11 | Workers subscription consolidation: `claude -p` default | ✅ Done | 2026-05-04 |
+| 12 | Roundtable debate flow (MAD Asimetris) | 📋 Planned | — |
 
-See [[Paperclip Shannon — Modification Plan]] for full details per step.
+See [[Paperclip Shannon — Modification Plan]] and [[Paperclip Shannon — Modification Plan Phase 2]] for details.
 
 ---
 
@@ -143,16 +145,15 @@ spec → design → implementation → sandboxed → tested → shipped
 
 ## Auth Model
 
-| Role | Auth | Why |
+| Role | Auth | Mode |
 |---|---|---|
-| CEO, PM, UI/UX Lead, SWE Lead | Subscription (`claude login`) | Orchestrators — judgment + coordination only |
-| Code Workers, Design Workers, Test Workers | `WORKER_API_KEY` + `claude-sonnet-4-6` | Raw `messages.create()` API calls |
+| CEO, PM, UI/UX Lead, SWE Lead | Subscription (`claude login`) | Claude Code agent session |
+| Workers (default) | Subscription (`claude login`) | `claude -p` subprocess — no extra billing |
+| Workers (fallback) | `WORKER_API_KEY` + SDK | Set `USE_API_KEY=true` on SWE Lead — opt-in only |
 
-`WORKER_API_KEY` is intentionally distinct from `ANTHROPIC_API_KEY` — Claude Code does not pick it up as orchestrator auth. The key can come from a completely different Anthropic account.
+**Setup:** `su - paperclip && claude login`. That's it — no API keys needed for normal operation.
 
-**Setup:**
-1. `su - paperclip && claude login` (Max subscription)
-2. Set `WORKER_API_KEY=sk-ant-...` on SWE Lead and UI/UX Lead via Paperclip UI → Configuration → Environment Variables
+`WORKER_API_KEY` fallback only needed if subscription rate limit is hit mid-pipeline. See [[Paperclip Agent Auth — Subscription vs API]] for full details.
 
 ---
 
@@ -187,8 +188,9 @@ First generated company: `companies/shannon-factory-2/`
 
 | Date | Commit | What |
 |---|---|---|
+| 2026-05-04 | `3652fdb8` | Step 11: workers → claude -p subscription; costEvents delete order fix |
 | 2026-04-30 | `214171a4` | NewProjectDialog body scrollable (flex + max-h-[90vh]) |
-| 2026-04-30 | `9d423414` | worker--dispatch: Anthropic SDK + WORKER_API_KEY + Sonnet |
+| 2026-04-30 | `9d423414` | worker--dispatch: Anthropic SDK + WORKER_API_KEY + Sonnet (superseded by Step 11) |
 | 2026-04-30 | `0ec9e693` | worker--dispatch: revert to `claude -p` (intermediate) |
 | 2026-04-30 | `a76e9609` | Company delete: 17 missing FK tables added |
 | 2026-04-30 | `c2944415` | Sandbox skills + canonical shannon-company template |

@@ -17,9 +17,13 @@ All vault documents sorted by **last updated date, newest first**. Update this f
 
 | Document | What it covers |
 |---|---|
-| [[AI Software Factory/Building/Paperclip Shannon — Current Condition 2026-05-04]] | New — full snapshot of fork state: all 10 steps complete, 30 skills inventory, auth model, open items, recent fix history |
-| [[Development Log/2026-04-30]] | New — session log for Steps 6–10 (Supabase CLI, sandbox skills, package fixes, SDK workers, delete fix) |
-| [[AI Software Factory/Building/Paperclip as White-Label Base — Strategic Assessment]] | Updated steps table: all 10 steps done (was showing 5) |
+| [[Development Log/2026-05-04]] | New — Step 11 session: claude -p concurrency test results, implementation, key findings |
+| [[AI Software Factory/Building/Paperclip Shannon — Modification Plan Phase 2]] | Step 11 all sub-tasks ✅; concurrency cap revised to 5 (empirical); key findings documented |
+| [[AI Software Factory/Building/Paperclip Shannon — Current Condition 2026-05-04]] | Updated: Step 11 ✅, head commit updated, auth model updated to subscription-only default |
+| [[AI Software Factory/Using/Paperclip Agent Auth — Subscription vs API]] | Rewritten: subscription is now the default for workers; WORKER_API_KEY is optional fallback; concurrency table added |
+| [[AI Software Factory/Building/Paperclip Shannon — Current Condition 2026-05-04]] | New (earlier today) — full snapshot: all 10 steps, 30 skills, auth model, open items |
+| [[Development Log/2026-04-30]] | New — session log for Steps 6–10 |
+| [[AI Software Factory/Building/Paperclip as White-Label Base — Strategic Assessment]] | Updated steps table: all 10 steps done |
 
 ---
 

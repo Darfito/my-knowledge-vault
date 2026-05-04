@@ -2,7 +2,7 @@
 title: "Paperclip Agent Auth — Subscription vs API"
 type: reference
 tags: [paperclip, auth, api, subscription, workers, rate-limits]
-date: 2026-04-28
+date: 2026-05-04
 ---
 
 # Paperclip Agent Auth — Subscription vs API
@@ -18,9 +18,9 @@ Paperclip supports two authentication modes for running agents. The right choice
 When the adapter is `claude_local` and **no `ANTHROPIC_API_KEY` is set**, Claude Code CLI authenticates via `claude login` — your Claude Max/Pro subscription. This means:
 
 - No per-token billing
-- No API rate limits (30k TPM)
+- Subject to Max plan rolling rate-limit window (~60 min reset)
 - Requires `claude login` on the server running Paperclip
-- Only works for the orchestrator agent itself (the Claude Code session)
+- Works for both orchestrator agents **and** `claude -p` worker subprocesses
 
 ### 2. Direct API (`ANTHROPIC_API_KEY`)
 
@@ -28,27 +28,24 @@ When `ANTHROPIC_API_KEY` is set in the agent's environment, Claude Code uses tha
 
 > `ANTHROPIC_API_KEY is set. Claude will use API-key auth instead of subscription credentials.`
 
-Direct API is required for:
-- Worker dispatch (Python `messages.create()` calls)
-- Any code that calls the Anthropic API directly (not via Claude Code CLI)
+Direct API is required only for `WORKER_API_KEY` fallback mode — not for normal operation.
 
 ---
 
-## Shannon Factory Split
+## Shannon Factory Auth Model
 
-The Shannon Factory uses both modes together:
+All agents run on subscription. Workers default to `claude -p` subprocess mode — same subscription, no additional billing.
 
-| Role | Auth | Why |
+| Role | Auth | Mode |
 |---|---|---|
-| CEO | Subscription (`claude login`) | Orchestrator — judgment and coordination only |
-| PM | Subscription (`claude login`) | Orchestrator — spec writing and handoff |
-| UI/UX Lead | Subscription (`claude login`) | Orchestrator — design spec + dispatches workers |
-| SWE Lead | Subscription (`claude login`) | Orchestrator — reviews output + dispatches workers |
-| **Code Workers** | **API key (`WORKER_API_KEY`)** | Direct `messages.create()` calls — Haiku |
-| **Design Workers** | **API key (`WORKER_API_KEY`)** | Direct `messages.create()` calls — Haiku |
-| **Test Workers** | **API key (`WORKER_API_KEY`)** | Direct `messages.create()` calls — Haiku |
+| CEO | Subscription (`claude login`) | Claude Code agent session |
+| PM | Subscription (`claude login`) | Claude Code agent session |
+| UI/UX Lead | Subscription (`claude login`) | Claude Code agent session |
+| SWE Lead | Subscription (`claude login`) | Claude Code agent session |
+| **Workers (default)** | **Subscription (`claude login`)** | **`claude -p` subprocess** |
+| Workers (fallback) | `WORKER_API_KEY` + Anthropic SDK | Direct `messages.create()` — opt-in only |
 
-Workers are NOT Claude Code sessions — they are raw API calls dispatched by the `worker-dispatch` skill. They always need an API key.
+Workers are NOT separate Claude Code sessions — they are `claude -p` subprocess calls dispatched in parallel by the `worker--dispatch` skill, using the same subscription credentials as the orchestrators.
 
 ---
 
@@ -62,22 +59,23 @@ claude login
 # Follow the browser auth flow with your Max account
 ```
 
-This stores credentials at `~/.claude/` for the `paperclip` user.
+Credentials stored at `~/.claude/` for the `paperclip` user. All orchestrators and `claude -p` workers inherit this.
 
-### Step 2 — Remove `ANTHROPIC_API_KEY` from orchestrator agents
+### Step 2 — Remove `ANTHROPIC_API_KEY` from all agents
 
-In each agent's Configuration tab → Environment variables → delete `ANTHROPIC_API_KEY`.
+In each agent's Configuration tab → Environment variables → delete `ANTHROPIC_API_KEY` if set.
 
-Or remove it from `~/paperclip-shannon/.env` if set globally.
+Or confirm it's absent from `~/paperclip-shannon/.env`.
 
-### Step 3 — Add `WORKER_API_KEY` to SWE Lead and UI/UX Lead only
+### Step 3 — (Optional) Add `WORKER_API_KEY` for fallback
 
-In the Paperclip UI → SWE Lead → Configuration → Environment variables:
-- `WORKER_API_KEY` = `sk-ant-...` (your Anthropic API key)
+Only needed if you hit the subscription rate limit mid-pipeline or want >5 workers in parallel beyond the cap.
 
-Same for UI/UX Lead. CEO and PM do not need this.
+In Paperclip UI → SWE Lead → Configuration → Environment variables:
+- `WORKER_API_KEY` = `sk-ant-...` (a separate Anthropic API key — can be from a different account)
+- `USE_API_KEY` = `true` (tells the dispatch script to use API key mode)
 
-The `worker-dispatch` skill reads `WORKER_API_KEY` (not `ANTHROPIC_API_KEY`) specifically to avoid Claude Code picking it up as API auth.
+CEO, PM, UI/UX Lead do not need these.
 
 ### Step 4 — Restart the dev server
 
@@ -87,7 +85,34 @@ pnpm dev:stop && pnpm dev --bind lan
 
 ---
 
+## Worker Concurrency (Empirical Findings — 2026-05-04)
+
+Tested `claude -p` subprocess concurrency on VPS (Claude Code 2.1.126):
+
+| Concurrent workers | Result |
+|---|---|
+| 3 | ✅ 0 failures, ~7s total |
+| 5 | ✅ 0 failures, ~8s total |
+| 7 | ✅ 0 failures, ~9s total |
+| 10 | ✅ 0 failures, ~10s total |
+| 15 | ✅ 0 failures, ~16s total |
+
+**Production cap: 5** — conservative vs the empirical safe max of 15. Raise only if needed.
+
+The previous concern about `claude -p` hanging at low concurrency (documented in Step 9 revert, 2026-04-30) does not apply to Claude Code 2.1.126. The hang was version-specific.
+
+---
+
 ## Rate Limits
+
+### Subscription mode (`claude -p`)
+
+- Subject to Max plan rolling window (approximately 60 minutes)
+- When hit: workers exit non-zero with rate-limit message in stderr
+- The dispatch script detects this and prints a retry notice
+- **No silent failure** — the ticket comment must be updated with a rate-limit block notice
+
+### API key mode (`WORKER_API_KEY`)
 
 | Tier | Requirement | Sonnet TPM |
 |---|---|---|
@@ -95,29 +120,9 @@ pnpm dev:stop && pnpm dev --bind lan
 | Tier 2 | $40+ cumulative spend | 50,000 |
 | Tier 3 | $200+ cumulative spend | 200,000 |
 
-**Having API credits ≠ higher tier.** Tier is based on cumulative spend, not balance. A new account with $20 in credits is still Tier 1.
+**Having API credits ≠ higher tier.** Tier is based on cumulative spend, not balance.
 
-**Claude.ai Max subscription ≠ API credits.** These are completely separate billing systems. Max gives unlimited claude.ai chat; it does not affect API rate limits.
-
-With subscription auth for orchestrators, the 30k TPM limit only applies to worker API calls — which use Haiku (~200 tokens per call) and rarely hit the cap.
-
----
-
-## Worker Mode: `claude -p` vs API Key
-
-Workers can run in two modes. Choose based on your situation:
-
-### Current setup — API key with Sonnet
-
-Workers call `anthropic.messages.create()` directly using `WORKER_API_KEY` and `claude-sonnet-4-6`. **This is the default in paperclip-shannon.**
-
-- `WORKER_API_KEY` is separate from `ANTHROPIC_API_KEY` — Claude Code ignores it, orchestrators stay on subscription
-- The key can come from a completely different Anthropic account than the orchestrators
-- Model: `claude-sonnet-4-6`
-- Speed: ~0.5-2s per worker (direct HTTP)
-- Full cost reporting to Paperclip dashboard (Sonnet: $3/$15 per MTok)
-- Safe at 10+ parallel workers
-- Set via Paperclip UI → SWE Lead → Configuration → Environment variables: `WORKER_API_KEY=sk-ant-...`
+**Claude.ai Max subscription ≠ API credits.** Completely separate billing systems.
 
 ---
 
@@ -125,8 +130,10 @@ Workers call `anthropic.messages.create()` directly using `WORKER_API_KEY` and `
 
 **Agent wakes up but immediately fails with 429** — `ANTHROPIC_API_KEY` is still set. Remove it so the agent uses subscription auth.
 
-**Workers fail with auth error** — `WORKER_API_KEY` is not set on the SWE Lead / UI/UX Lead agent (API key mode only).
+**Workers produce empty output** — Check if `claude -p` is producing a stderr warning. Run `claude -p "hello"` manually as the `paperclip` user to confirm subscription credentials are valid.
 
 **`claude login` doesn't persist between server restarts** — Credentials are stored per Unix user. Make sure you ran `claude login` as the `paperclip` user (not root or santoso).
 
-**`claude -p` workers hang** — Too many concurrent `claude -p` processes. Reduce `asyncio.gather()` concurrency to 3-5 workers.
+**Subscription rate limit hit mid-pipeline** — Set `USE_API_KEY=true` and `WORKER_API_KEY=sk-ant-...` on SWE Lead to temporarily switch to API key mode. Restore to subscription after the window resets.
+
+**API key workers fail with auth error** — `WORKER_API_KEY` is not set, or `USE_API_KEY` is not `true`.
