@@ -246,6 +246,9 @@ What is missing today to achieve a *fully automated* AI Software Factory — der
 ### Tools & Active Solutions (this vault)
 - [[Claude Memory Compiler]] — Hook-driven institutional memory system. Implements Shannon Phase 6 (Feedback OS) as running infrastructure. Addresses Gaps #17 and #20. Source at `refrensi/claude-memory-compiler/`. Three-tier integration strategy: (A) workspace hooks today, (B) reflect-task bridge, (C) named-agent tagging in compile.py.
 
+### Architecture Knowledge (this vault — `AI Software Factory/Building/`)
+- [[Single-Agent vs Multi-Agent — Patterns & Tradeoffs]] — Practical breakdown of single vs multi-agent design: when to use each, quality tradeoffs, architecture rules, and how the hierarchical pattern maps to the factory's Orchestrator-Worker model. Source: Ida Silfverskiöld / Data Science Collective, Oct 2025.
+
 ### Narrative notes (`ian/`)
 - [[00 - Project Overview]]
 - [[00 - Project Index (v2)]]
