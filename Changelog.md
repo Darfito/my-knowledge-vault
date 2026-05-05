@@ -17,6 +17,8 @@ All vault documents sorted by **last updated date, newest first**. Update this f
 
 | Document | What it covers |
 |---|---|
+| [[AI Software Factory/Using/Shannon V3 — Test Playbook with Rollback]] | New — operational playbook for testing v3 alongside the existing v2 production company. Phase-by-phase steps, rollback matrix at every checkpoint, acceptance criteria |
+| [[AI Software Factory/Using/Paperclip Agents vs Workers — Shared Subscription Model]] | New — practical implications of agents and workers sharing one subscription post-Step-11: process model differences, capacity envelope, when the difference matters, fallback escape |
 | [[AI Software Factory/Building/Shannon Company Templates — v2 vs v3]] | New — explains the v3 (roundtable / debate-aware) company template, how it differs from v2 (sequential), when to use which, and the server changes v3 depends on |
 
 ---
