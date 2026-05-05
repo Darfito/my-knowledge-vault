@@ -13,6 +13,14 @@ All vault documents sorted by **last updated date, newest first**. Update this f
 
 ---
 
+## 2026-05-05
+
+| Document | What it covers |
+|---|---|
+| [[AI Software Factory/Building/Shannon Company Templates — v2 vs v3]] | New — explains the v3 (roundtable / debate-aware) company template, how it differs from v2 (sequential), when to use which, and the server changes v3 depends on |
+
+---
+
 ## 2026-05-04
 
 | Document | What it covers |
