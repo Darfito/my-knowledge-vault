@@ -13,18 +13,23 @@ All vault documents sorted by **last updated date, newest first**. Update this f
 
 ---
 
-## 2026-05-10
+## 2026-05-10 (session 2 — implementation)
 
 | Document | What it covers |
 |---|---|
-| [[AI Software Factory/Building/Step 13 — Auto-Wakeup Fix Plan]] | New — auto-wakeup fix for debate router: root cause, system comment design per routing path, exact codebase locations, implementation order, acceptance criteria |
-| [[AI Software Factory/Building/Step 14 — URS Skills Port Plan]] | New — URS-first skills port plan: 5 skills (urs-draft, urs-compile, sprint-plan, shape-spec extension, urs--create-issues), end-to-end kickoff flow, full checklist |
-| [[AI Software Factory/Building/Paperclip Shannon — Current Condition 2026-05-10]] | New — updated state snapshot: Steps 1–12 done, Steps 13–14 planned; v4 company variants documented; open blockers listed |
-| [[AI Software Factory/Building/Shannon Company Templates — v4]] | New — v4 company design: auto-wakeup via system comments, URS-first lane, 5 new skills, agent instruction changes; when to use v4 vs v3 vs v2 |
-| [[AI Software Factory/Building/Shannon Company — Evolution v2 to v4]] | New — complete history of Shannon company evolution: milestone per version, what changed at each jump, rationale behind each design decision |
-| [[AI Software Factory/Building/Shannon Company Templates — v2 vs v3]] | Updated — tambah v4 ke tabel perbandingan dan catatan server requirement |
-| [[AI Software Factory/Building/Paperclip Shannon — Modification Plan Phase 2]] | Updated — Step 12 marked ✅ done; Steps 13 & 14 added as planning entries |
-| [[AI Software Factory/Building/Personas & Skills Matrix]] | Updated — 5 URS skills baru di kolom PM (planned, Step 14) |
+| [[AI Software Factory/Building/Paperclip Shannon — Modification Plan Phase 2]] | Updated — Steps 13 & 14 marked ✅ DONE; status → complete; sub-tasks checked; acceptance criteria filled |
+
+### Code shipped (paperclip-shannon, not vault docs)
+
+| Commit | What shipped |
+|---|---|
+| `7140842e` | **Steps 12+13** — debate-router.ts (signal routing + sycophancy guard) + system comment wakeup in issues.ts; DECISION excluded from round-trip cap; 31 unit tests pass; Autonomous Continuation section added to all 4 agents in shannon-v3-company.md |
+| `2810ad27` | **Step 14** — 5 URS skills: foundation--urs-draft, foundation--urs, foundation--sprint-plan, foundation--shape-spec (--from-urs extension), urs--create-issues; shannon-v4-company.md template (separate from v3); company-creator SKILL.md updated to offer v2/v3/v4 |
+| `1b257246` | **URS file import in New Project dialog** — POST /api/documents/parse endpoint (pdf-parse v2 for PDF, UTF-8 read for .md, 5 MB cap); "Import URS" button in NewProjectDialog prepends extracted text to description; no company template change needed |
+
+---
+
+## 2026-05-10 (session 1 — planning & docs)
 
 ---
 
