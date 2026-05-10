@@ -2,7 +2,7 @@
 title: "Changelog — Document Registry"
 type: navigation
 tags: [index, changelog, navigation]
-date: 2026-04-27
+date: 2026-05-10
 ---
 
 # Changelog — Document Registry
@@ -10,6 +10,15 @@ date: 2026-04-27
 All vault documents sorted by **last updated date, newest first**. Update this file whenever you create or significantly revise a document.
 
 > **How to use:** Scan from the top to catch what's new. Each entry has a one-line summary of what the document covers so you can judge relevance without opening it.
+
+---
+
+## 2026-05-10
+
+| Document | What it covers |
+|---|---|
+| [[AI Software Factory/Building/Step 13 — Auto-Wakeup Fix Plan]] | New — auto-wakeup fix for debate router: root cause, system comment design per routing path, exact codebase locations, implementation order, acceptance criteria |
+| [[AI Software Factory/Building/Step 14 — URS Skills Port Plan]] | New — URS-first skills port plan: 5 skills (urs-draft, urs compile, sprint-plan, shape-spec extension, urs--create-issues), end-to-end kickoff flow, full checklist |
 
 ---
 
