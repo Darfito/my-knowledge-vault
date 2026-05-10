@@ -56,7 +56,7 @@ The stdin warning (`Warning: no stdin data received in 3s`) is suppressed by pas
 
 ---
 
-## Step 12 — Roundtable Debate Flow (MAD Asimetris)
+## Step 12 — Roundtable Debate Flow (MAD Asimetris) ✅ DONE (~2026-05-05)
 
 **Spec:** [[Roundtable Discussion Architecture]]
 
@@ -64,69 +64,88 @@ The stdin warning (`Warning: no stdin data received in 3s`) is suppressed by pas
 
 ### Sub-tasks
 
-- [ ] **12.1 — Discussion Board storage.** Decide and implement:
-  - [ ] Option (a): new column `issues.discussion_board` (JSONB) — append-only tagged sections
-  - [ ] Option (b): structured comment-thread aggregation — Paperclip parses tagged comments at read time
-  - **Recommendation:** Option (b) — leverages existing comment infrastructure, no migration risk
+- [x] **12.1 — Discussion Board storage.** Chose Option (b): structured comment-thread aggregation. Leverages existing comment infrastructure, no migration risk.
+- [x] **12.2 — Signal parser.** `parseDebateSignal()` added as sibling to `parseNextCommand()` in `server/src/routes/issues.ts`. Handles all 8 signal tags.
+- [x] **12.3 — Routing logic.** `server/src/services/debate-router.ts` created. Tracks revision count, escalation to CEO at count=2, human checkpoint at count=5, `[LGTM]` triggers stage advance.
+- [x] **12.4 — `≥2 concerns` server-side validation.** Returns HTTP 400 for malformed `[CONFIRMED]` without ≥2 enumerated items.
+- [x] **12.5 — Agent skill prompt updates.** `shannon-v3-company.md` created with all 4 agent instruction sets.
+- [x] **12.6 — UI surfacing.** Text-only board via existing comment thread. Visual diff deferred.
+- [x] **12.7 — Hard upper bound.** Max 5 round-trips before human checkpoint.
+- [x] **12.8 — End-to-end test.** Verified via shannon-v3-test company.
 
-- [ ] **12.2 — Signal parser.** Add helper sibling to `parseNextCommand()` in `server/src/routes/issues.ts`:
-  - [ ] `parseDebateSignal(comment)` returns `{ tag, version?, payload }`
-  - [ ] Handles: `[TASK]`, `[PM BRIEF v<n>]`, `[CONFIRMED]`, `[CONCERNS]`, `[DECISION]`, `[UI/UX SPEC]`, `[LGTM]`, `[NEEDS_DESIGN: yes/no]`
+**Known issue found post-Step-12:** After `debate-router.ts` reassigns the issue, the new agent does not auto-wake. Human must post a manual comment to trigger wakeup. → Fixed in **Step 13**.
 
-- [ ] **12.3 — Routing logic.** New service `server/src/services/debate-router.ts`:
-  - [ ] Determines next assignee based on most recent signal on issue
-  - [ ] Tracks PM revision count (in-memory derive from comment scan)
-  - [ ] Triggers escalation to CEO at revision count = 2 with persistent `[CONCERNS]`
-  - [ ] Triggers human `request_confirmation` when CEO emits decision-stuck signal
-  - [ ] Emits `NEXT_COMMAND: stage=design` (or `implementation`) on `[LGTM]`
+---
 
-- [ ] **12.4 — `≥2 concerns` server-side validation.** Reject SWE Lead comments that emit `[CONFIRMED]` without ≥2 enumerated lines following. Returns 400 with clear error so the agent retries with valid output.
+## Step 13 — Auto-Wakeup Fix (Debate Router)
 
-- [ ] **12.5 — Agent skill prompt updates.** In `.agents/skills/company-creator/references/shannon-company.md`:
-  - [ ] CEO instructions: emit `[TASK]` + `[NEEDS_DESIGN: yes/no]` flag
-  - [ ] PM instructions: emit `[PM BRIEF v<n>]` with required sections
-  - [ ] SWE Lead instructions: read full Discussion Board before output; emit `[CONFIRMED]` or `[CONCERNS]` with ≥2 enumerated items; emit `[LGTM]` only as final signal
-  - [ ] UI/UX instructions: triggered only when `[NEEDS_DESIGN: yes]`; emits `[UI/UX SPEC]`
+**Spec:** [[Step 13 — Auto-Wakeup Fix Plan]]
 
-- [ ] **12.6 — UI surfacing.** Issue detail view in Paperclip dashboard shows:
-  - [ ] Current debate state (waiting on whom)
-  - [ ] PM revision count
-  - [ ] Visual diff of [PM BRIEF v1] → [PM BRIEF v2]
-  - **Optional for v1** — text-only board is acceptable initially
+**Goal:** Eliminate manual human intervention after every routing decision. Server posts a `[System — Pipeline]` comment immediately after each routing, which Paperclip uses as the wakeup trigger for the newly assigned agent.
 
-- [ ] **12.7 — Hard upper bound.** Add max-round-trips counter (default 5). At 5, force-escalate to human checkpoint regardless of signals.
+### Sub-tasks
 
-- [ ] **12.8 — End-to-end test.** Create one test issue, drive through:
-  - [ ] CEO `[TASK]` → PM `[PM BRIEF v1]` → SWE `[CONCERNS]` → PM `[PM BRIEF v2]` → SWE `[CONFIRMED]` → `[LGTM]`
-  - [ ] Verify pipeline_stage advances to `design` or `implementation`
-  - [ ] Verify deadlock path: force 2 SWE concerns → CEO `[DECISION]` → resume
+- [ ] **13.1 — Read codebase.** Read `debate-router.ts`, `routes/issues.ts`, `issue-comments.ts` schema, and wakeup notification mechanism.
+- [ ] **13.2 — Extend `RoutingResult` type.** Add `systemComment: string | null` field to the return type of the routing function.
+- [ ] **13.3 — Populate systemComment per path.** 8 routing paths × distinct instruction text (see plan doc for exact wording).
+- [ ] **13.4 — Insert system comment in `routes/issues.ts`.** After DB update for assignee/stage, insert row in `issue_comments` if `routing.systemComment` is set.
+- [ ] **13.5 — Verify wakeup trigger.** Confirm `author_type: 'system'` comment triggers Paperclip wakeup. If not, use `author_type: 'agent'` with `authorAgentId: currentAgentId` as fallback.
+- [ ] **13.6 — Update AGENTS.md for all 4 agents.** Add "Autonomous Continuation" section explaining how to act on the system comment without waiting for human input.
+- [ ] **13.7 — Typecheck.** `pnpm -r typecheck` exit 0.
+- [ ] **13.8 — End-to-end test.** Walk a full debate thread on shannon-v3-test; verify no human comment needed between routing steps.
 
 ### Acceptance criteria
 
-- [ ] All four agents produce correctly tagged output
-- [ ] Server enforces signal grammar (rejects malformed)
-- [ ] Discussion Board reconstructible from comment thread alone (no separate state)
-- [ ] CEO escalation path works in both directions: agent-resolved and human-resolved
-- [ ] UI/UX skipped when `[NEEDS_DESIGN: no]`
+- [ ] CEO posts [TASK] → PM automatically gets system comment and posts [PM BRIEF]
+- [ ] PM posts [PM BRIEF] → SWE Lead automatically wakes and posts [CONFIRMED] or [CONCERNS]
+- [ ] SWE posts [CONCERNS] → PM automatically wakes for revision
+- [ ] After 2× concerns → CEO automatically gets escalation system comment
+- [ ] After [LGTM] → pipeline_stage advances (already works from v3; verify still works)
+- [ ] v2 company unaffected
+- [ ] `pnpm -r typecheck` exit 0
+- [ ] `debate-router.test.ts` 22 existing tests pass + new tests for `systemComment` field
 
-### Risks
+---
 
-- Signal grammar drift — agents emitting almost-correct tags. Mitigation: 12.4 server-side validation forces correctness.
-- Performance: full comment scan per routing decision. Mitigation: cache last-known signal per issue in service layer; rebuild only on new comment.
+## Step 14 — URS Skills Port
+
+**Spec:** [[Step 14 — URS Skills Port Plan]]
+
+**Prerequisite:** Step 13 must be complete and verified.
+
+**Goal:** Enable Shannon pipeline to start from a URS document. CEO ingests or drafts URS; PM compiles it and auto-creates Sprint 0 issues; each issue specs itself via `foundation--shape-spec --from-urs`.
+
+### Sub-tasks
+
+- [ ] **14.1 — Read source files.** `ai-software-factory/.claude/commands/foundation/{urs-draft,urs,sprint-plan,shape-spec}.md` + ADR 0002 & 0003.
+- [ ] **14.2 — Port `foundation--urs-draft`.** New `skills/foundation--urs-draft/SKILL.md`. CEO skill: structures brief → `urs/main.md`.
+- [ ] **14.3 — Port `foundation--urs`.** New `skills/foundation--urs/SKILL.md`. PM skill: compiles `urs/main.md` → `index.json`, `applies-to.json`, `main.tex`.
+- [ ] **14.4 — Port `foundation--sprint-plan`.** New `skills/foundation--sprint-plan/SKILL.md`. PM skill: bin-packs FRs → `clusters.json`, `sprint-plan.md`.
+- [ ] **14.5 — Extend `foundation--shape-spec`.** Add `--from-urs FR-XX` mode to existing SKILL.md. Reads from `urs/index.json`; writes `specs/` + `urs/tasks/`.
+- [ ] **14.6 — Build `urs--create-issues`.** New `skills/urs--create-issues/SKILL.md`. Shannon-specific: POST one issue per Sprint 0 FR via Paperclip API.
+- [ ] **14.7 — Update company templates.** `shannon-v3-company.md` + new `shannon-v4-company.md` — CEO URS-First Kickoff + PM URS Compilation sections. Update `company-creator` SKILL.md to offer v4.
+- [ ] **14.8 — End-to-end test.** Kickoff issue with 5-FR sample URS → verify full automated flow.
+
+### Acceptance criteria
+
+- See [[Step 14 — URS Skills Port Plan]] checklist for full breakdown
+- [ ] `pnpm -r typecheck` exit 0
+- [ ] Existing v2 company unaffected
 
 ---
 
 ## Implementation Order
 
 ```
-Step 11 → Step 12
-billing    debate
+Step 11 → Step 12 → Step 13 → Step 14
+billing    debate    wakeup    URS-first
 ```
 
 **Why this order:**
 1. Step 11 reduces operating cost immediately — every day of delay = burnt API credits.
 2. Step 12 is a larger, riskier change. Doing it on top of stabilized billing means cost overrun during debate-flow rollout is bounded.
-3. Steps are independent — Step 11 does not depend on Step 12 or vice versa, but sequencing reduces blast radius.
+3. Step 13 is a usability blocker — without auto-wakeup, the v3 debate flow requires constant human prompting and is unusable in production.
+4. Step 14 requires Step 13 — the URS-first chain (CEO → PM → N FR issues) stalls without auto-wakeup at every hop.
 
 ---
 

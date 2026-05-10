@@ -14,16 +14,19 @@ date: 2026-05-05
 
 ## At a glance
 
-| | v2 — `shannon-company.md` | v3 — `shannon-v3-company.md` |
-|---|---|---|
-| Spec-stage routing | Linear handoff via `NEXT_COMMAND:` markers | Tagged-signal debate; server `debate-router` reassigns automatically |
-| Validation gate | None — PM brief flows straight to UI/UX | SWE Lead emits `[CONFIRMED]` / `[CONCERNS]` (≥2 enumerated items, server-enforced) before `[LGTM]` |
-| UI/UX trigger | Always at `pipeline_stage: design` | Only when CEO sets `[NEEDS_DESIGN: yes]` — invoked inline during spec stage |
-| Deadlock handling | None | After 2 PM revisions with persistent SWE concerns → escalate to CEO `[DECISION]`; after 5 round-trips → human `request_confirmation` |
-| Pipeline advance after spec | Each agent posts `NEXT_COMMAND:` | `[LGTM]` from SWE Lead triggers automatic advance to `design` (if NEEDS_DESIGN: yes) or `implementation` (if no) |
-| Reporting line | SWE reports to UI/UX (`reportsTo: designer`) | SWE reports to CEO (`reportsTo: ceo`) — reflects deadlock escalation authority |
-| Pattern reference | Sequential pipeline | MAD Asimetris (Multi-Agent Debate, asymmetric) — see [[Roundtable Discussion Architecture]] |
-| Server requirement | Pre-Step-12 server is fine | Requires `server/src/services/debate-router.ts` (Step 12 — landed on `feat/step-12-roundtable` or master after merge) |
+| | v2 — `shannon-company.md` | v3 — `shannon-v3-company.md` | v4 — `shannon-v4-company.md` |
+|---|---|---|---|
+| Spec-stage routing | Linear handoff via `NEXT_COMMAND:` markers | Tagged-signal debate; server `debate-router` reassigns automatically | Same as v3 — unchanged |
+| Validation gate | None | SWE Lead emits `[CONFIRMED]` / `[CONCERNS]` (≥2 items, server-enforced) | Same as v3 — unchanged |
+| UI/UX trigger | Always at `pipeline_stage: design` | Only when CEO sets `[NEEDS_DESIGN: yes]` | Same as v3 — unchanged |
+| Auto-wakeup after assignment | ❌ Manual comment needed | ❌ Manual comment needed | ✅ Server posts `[System — Pipeline]` comment |
+| URS-first kickoff lane | ❌ | ❌ | ✅ CEO drafts URS → PM compiles + creates Sprint 0 issues |
+| Deadlock handling | None | 2 revisions → CEO `[DECISION]`; 5 round-trips → human checkpoint | Same as v3 — unchanged |
+| Pipeline advance after spec | Each agent posts `NEXT_COMMAND:` | `[LGTM]` from SWE Lead triggers automatic advance | Same as v3 — unchanged |
+| Reporting line | SWE → UI/UX (`reportsTo: designer`) | SWE → CEO (`reportsTo: ceo`) | Same as v3 — unchanged |
+| Pattern reference | Sequential pipeline | MAD Asimetris — [[Roundtable Discussion Architecture]] | MAD Asimetris + URS-first ingestion |
+| Server requirement | Pre-Step-12 | `debate-router.ts` (Step 12) | Step 12 + system comment insert (Step 13) |
+| New skills | — | — | 5 URS skills + `--from-urs` mode on `shape-spec` |
 
 Outside the spec stage (`design → implementation → sandboxed → tested → shipped`) both variants behave identically and use `NEXT_COMMAND:` for pipeline advancement.
 
@@ -61,9 +64,12 @@ Re-importing with the opposite template into the same `<project-slug>` overwrite
 ## When to use which
 
 - **Start with v2** when: the PM brief is unlikely to need technical pushback, you want zero new server-side surface area, or you want the simplest possible handoff for a one-off project.
-- **Use v3** when: SWE Lead should validate PM briefs before execution, you want server-enforced sycophancy guards, or the project benefits from documented `[CONCERNS]` round-trips for retro analysis.
+- **Use v3** when: SWE Lead should validate PM briefs before execution, you want server-enforced sycophancy guards, or the project benefits from documented `[CONCERNS]` round-trips — but you don't have a URS and don't need URS-first flow.
+- **Use v4** when: you have a URS document (or a brief CEO can structure into one), and you want the full automated pipeline from URS ingestion → sprint planning → issue creation → spec → debate → implementation.
 
-v3 is opinionated about how disagreements surface — `[CONCERNS]` requires ≥2 enumerated items, and server-side validation will reject malformed comments with HTTP 400. Tradeoff: more rigorous spec, more comment volume.
+v3 and v4 are opinionated about how disagreements surface — `[CONCERNS]` requires ≥2 enumerated items, and server-side validation will reject malformed comments with HTTP 400. Tradeoff: more rigorous spec, more comment volume.
+
+For the full v4 design, see [[Shannon Company Templates — v4]].
 
 ---
 
@@ -80,7 +86,9 @@ If the agents post tagged signals on a pre-Step-12 server, the comments save nor
 
 ## Related
 
-- [[Roundtable Discussion Architecture]] — the MAD Asimetris spec v3 implements
-- [[Paperclip Shannon — Modification Plan Phase 2]] — Step 12 plan, sub-tasks 12.1–12.8
-- [[Paperclip Shannon — Current Condition 2026-05-04]] — pre-v3 baseline
+- [[Shannon Company Templates — v4]] — v4 detailed design
+- [[Shannon Company — Evolution v2 to v4]] — full evolution history with rationale
+- [[Roundtable Discussion Architecture]] — the MAD Asimetris spec v3/v4 implements
+- [[Paperclip Shannon — Modification Plan Phase 2]] — Step 12 history, Steps 13 & 14 plan
+- [[Paperclip Shannon — Current Condition 2026-05-10]] — current state baseline
 - [[Single-Agent vs Multi-Agent — Patterns & Tradeoffs]] — pattern background

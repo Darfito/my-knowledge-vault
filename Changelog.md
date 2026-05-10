@@ -18,7 +18,13 @@ All vault documents sorted by **last updated date, newest first**. Update this f
 | Document | What it covers |
 |---|---|
 | [[AI Software Factory/Building/Step 13 — Auto-Wakeup Fix Plan]] | New — auto-wakeup fix for debate router: root cause, system comment design per routing path, exact codebase locations, implementation order, acceptance criteria |
-| [[AI Software Factory/Building/Step 14 — URS Skills Port Plan]] | New — URS-first skills port plan: 5 skills (urs-draft, urs compile, sprint-plan, shape-spec extension, urs--create-issues), end-to-end kickoff flow, full checklist |
+| [[AI Software Factory/Building/Step 14 — URS Skills Port Plan]] | New — URS-first skills port plan: 5 skills (urs-draft, urs-compile, sprint-plan, shape-spec extension, urs--create-issues), end-to-end kickoff flow, full checklist |
+| [[AI Software Factory/Building/Paperclip Shannon — Current Condition 2026-05-10]] | New — updated state snapshot: Steps 1–12 done, Steps 13–14 planned; v4 company variants documented; open blockers listed |
+| [[AI Software Factory/Building/Shannon Company Templates — v4]] | New — v4 company design: auto-wakeup via system comments, URS-first lane, 5 new skills, agent instruction changes; when to use v4 vs v3 vs v2 |
+| [[AI Software Factory/Building/Shannon Company — Evolution v2 to v4]] | New — complete history of Shannon company evolution: milestone per version, what changed at each jump, rationale behind each design decision |
+| [[AI Software Factory/Building/Shannon Company Templates — v2 vs v3]] | Updated — tambah v4 ke tabel perbandingan dan catatan server requirement |
+| [[AI Software Factory/Building/Paperclip Shannon — Modification Plan Phase 2]] | Updated — Step 12 marked ✅ done; Steps 13 & 14 added as planning entries |
+| [[AI Software Factory/Building/Personas & Skills Matrix]] | Updated — 5 URS skills baru di kolom PM (planned, Step 14) |
 
 ---
 

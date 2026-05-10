@@ -20,8 +20,8 @@ No dedicated Reviewer persona — the SWE Lead + Worker output review covers it.
 
 | Persona | Type | Model | Global Skills | Project Skills | External Skills |
 |---|---|---|---|---|---|
-| CEO | Full Agent | Sonnet / Opus | — | — | `docx`, `pptx` (strategy docs/briefings) |
-| PM | Full Agent | Sonnet | `foundation:inject-standards` | `foundation:discover`, `foundation:plan`, `foundation:status`, `foundation:shape-spec`, `foundation:validate` | `docx` (specs), `xlsx` (backlog exports) |
+| CEO | Full Agent | Sonnet / Opus | — | `foundation:urs-draft` *(v4 — structures brief into URS)* | `docx`, `pptx` (strategy docs/briefings) |
+| PM | Full Agent | Sonnet | `foundation:inject-standards` | `foundation:discover`, `foundation:plan`, `foundation:status`, `foundation:shape-spec`, `foundation:validate`, `foundation:urs` *(v4)*, `foundation:sprint-plan` *(v4)*, `urs:create-issues` *(v4)* | `docx` (specs), `xlsx` (backlog exports) |
 | UI/UX | Light Agent | Sonnet | `foundation:inject-standards` | `design:import`, `design:system` | `pdf-reading` (Figma exports), `docx`/`pdf` (design docs) |
 | SWE Lead | Full Agent | Sonnet / Opus | `architecture:review`, `implementation:review`, `data-fetching:review`, `foundation:inject-standards`, `sandbox:up/down/test/status`, `worker:dispatch` | `architecture:new-feature`, `implementation:new-feature` | Code-review / git skills from skills.sh |
 | **Code Worker** | **Worker** | **Haiku** | — | Writes one component/module per call | — |
