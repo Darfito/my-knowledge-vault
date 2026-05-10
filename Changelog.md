@@ -13,6 +13,20 @@ All vault documents sorted by **last updated date, newest first**. Update this f
 
 ---
 
+## 2026-05-10 (session 3 — Artifacts viewer)
+
+### Code shipped (paperclip-shannon, not vault docs)
+
+| File | What shipped |
+|---|---|
+| `server/src/routes/projects.ts` | **Artifacts API** — `GET /projects/:id/artifacts` scans primary workspace cwd for 10 known PM artifact paths (urs/\*, specs/\*.md, .claude/docs/\*) + glob dirs (urs/tasks/FR-\*.json, specs/\*.md); returns content + size. `PUT /projects/:id/artifacts` writes back with path-traversal guard + known-path whitelist. |
+| `ui/src/api/artifacts.ts` | New API client — `artifactsApi.list()` and `artifactsApi.save()` |
+| `ui/src/components/ArtifactsTab.tsx` | Two-panel Artifacts tab: folder-grouped file tree on the left, viewer/editor on the right. Markdown renders via MarkdownBody; JSON/tex as monospace pre. Edit button → raw textarea + Save/Discard. |
+| `ui/src/pages/ProjectDetail.tsx` | "Artifacts" tab wired into project detail page (tab bar, route handling, localStorage cache) |
+| `ui/src/App.tsx` | Route `/projects/:projectId/artifacts` added |
+
+---
+
 ## 2026-05-10 (session 2 — implementation)
 
 | Document | What it covers |
